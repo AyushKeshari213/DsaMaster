@@ -1,7 +1,43 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Clock, ExternalLink, ListChecks, CheckCircle2, Lightbulb } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Clock, ExternalLink, ListChecks, CheckCircle2, Lightbulb, ChevronDown } from 'lucide-react'
 import { getModule, modules } from '../data/modules.js'
 import ModuleIcon from '../components/ModuleIcon.jsx'
+
+function LessonAccordion({ lesson }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="overflow-hidden rounded-xl border border-slate-200">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-slate-50"
+        aria-expanded={open}
+      >
+        <span className="text-base font-semibold text-slate-900">{lesson.term}</span>
+        <ChevronDown
+          size={18}
+          className={`shrink-0 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && (
+        <div className="border-t border-slate-100 px-4 py-4">
+          <p className="text-sm leading-relaxed text-slate-600">{lesson.definition}</p>
+          {lesson.points && (
+            <ul className="mt-3 space-y-2">
+              {lesson.points.map((p) => (
+                <li key={p} className="flex items-start gap-2 text-sm text-slate-600">
+                  <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-500" />
+                  {p}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function ModuleDetail() {
   const { slug } = useParams()
@@ -71,14 +107,23 @@ export default function ModuleDetail() {
                   </span>
                   <h3 className="text-lg font-bold text-slate-900">{t.name}</h3>
                 </div>
-                <ul className="mt-4 space-y-2 pl-1">
-                  {t.points.map((p) => (
-                    <li key={p} className="flex items-start gap-2 text-sm text-slate-600">
-                      <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-500" />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
+
+                {t.lessons ? (
+                  <div className="mt-5 space-y-3">
+                    {t.lessons.map((lesson) => (
+                      <LessonAccordion key={lesson.term} lesson={lesson} />
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="mt-4 space-y-2 pl-1">
+                    {t.points.map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-sm text-slate-600">
+                        <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-500" />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>
